@@ -359,6 +359,7 @@ def generate_continuous_random_interps(sess, dcgan, config, total_frame_num):
     z1 = np.asarray(rand_batch_z[0, :])
     z2 = np.asarray(rand_batch_z[1, :])
     batch_seeds = np.zeros(shape=(64, 100))
+    batch_idx = 0
     while stored_images < total_frame_num:
         # batch_idx = 0
         # while batch_idx < config.batch_size:
