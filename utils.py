@@ -352,45 +352,46 @@ def walk_seed(seed):
     return result_seed
 
 def generate_continuous_random_interps(sess, dcgan, config, total_frame_num):
-    steps_per_interp = 16   # PARAM
+    steps_per_interp = 60   # PARAM
     stored_images = 0
     time_stamp = strftime("%Y%m%d-%H%M%S", gmtime())
     rand_batch_z = np.random.uniform(-1, 1, size=(2 , dcgan.z_dim))
     z1 = np.asarray(rand_batch_z[0, :])
     z2 = np.asarray(rand_batch_z[1, :])
     while stored_images < total_frame_num:
-        batch_idx = 0
-        batch_seeds = np.zeros(shape=(64, 100))
-        while batch_idx < config.batch_size:
-            for i, ratio in enumerate(np.linspace(0, 1, steps_per_interp)):
-                slerped_z = slerp(ratio, z1, z2)
-                print("MEEE ratio: " + str(ratio) + " z1: " + str(z1.shape) + " z2: " + str(z2.shape))
-                # batch_seeds = np.append(batch_seeds, [slerped_z], axis=0)
-                batch_seeds[batch_idx] = slerped_z
-                print("MEEE batch_seeds: " + str(batch_seeds.shape) + " , slerped_z: " + str(slerped_z.shape))
-                batch_idx += 1
+        # batch_idx = 0
+        # while batch_idx < config.batch_size:
+        for i, ratio in enumerate(np.linspace(0, 1, steps_per_interp)):
+            slerped_z = slerp(ratio, z1, z2)
+            print("MEEE ratio: " + str(ratio) + " z1: " + str(z1.shape) + " z2: " + str(z2.shape))
+            # batch_seeds = np.append(batch_seeds, [slerped_z], axis=0)
+            batch_seeds[batch_idx] = slerped_z
+            print("MEEE batch_seeds: " + str(batch_seeds.shape) + " , slerped_z: " + str(slerped_z.shape))
+            batch_idx += 1
 
-                # if batch_idx >= config.batch_size:
-                #     break
+            if batch_idx >= config.batch_size:
+                # break
+                samples = sess.run(dcgan.sampler, feed_dict={dcgan.z: batch_seeds})
 
-            rand_batch_z = np.random.uniform(-1, 1, size=(config.batch_size , dcgan.z_dim))
-            z1 = z2
-            z2 = np.asarray(rand_batch_z[0, :])
-            # z2 = np.random.uniform(-1, 1, size=(1 , dcgan.z_dim))[0]
-            print("MEEE newly assigned z1: " + str(z1))
-            print("MEEE newly gen uniform z2: " + str(z2))
+                # Naming
+                for i in range(config.batch_size):
+                    save_name = 'ContInterp_{}_{:05d}'.format(time_stamp , stored_images)
+                    img_path = './samples/' + save_name + '.png'
+                    scipy.misc.imsave(img_path, samples[i, :, :, :])
+                    print(Fore.CYAN + "MEEE Continuous random interp image generated: " + img_path)
+                    stored_images += 1
+                    if stored_images >= total_frame_num:
+                        return
+                batch_idx = 0
+                batch_seeds = np.zeros(shape=(64, 100))
 
-        samples = sess.run(dcgan.sampler, feed_dict={dcgan.z: batch_seeds})
+        rand_batch_z = np.random.uniform(-1, 1, size=(config.batch_size , dcgan.z_dim))
+        z1 = z2
+        z2 = np.asarray(rand_batch_z[0, :])
+        # z2 = np.random.uniform(-1, 1, size=(1 , dcgan.z_dim))[0]
+        print("MEEE newly assigned z1: " + str(z1))
+        print("MEEE newly gen uniform z2: " + str(z2))
 
-        # Naming
-        for i in range(config.batch_size):
-            save_name = 'ContInterp_{}_{:05d}'.format(time_stamp , stored_images)
-            img_path = './samples/' + save_name + '.png'
-            scipy.misc.imsave(img_path, samples[i, :, :, :])
-            print(Fore.CYAN + "MEEE Continuous random interp image generated: " + img_path)
-            stored_images += 1
-            if stored_images >= total_frame_num:
-                return
 
 
 def slerp(val, low, high):
