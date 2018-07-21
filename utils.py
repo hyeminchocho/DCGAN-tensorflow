@@ -352,7 +352,7 @@ def walk_seed(seed):
     return result_seed
 
 def generate_continuous_random_interps(sess, dcgan, config, total_frame_num):
-    steps_per_interp = 8   # PARAM
+    steps_per_interp = 4   # PARAM
     stored_images = 0
     time_stamp = strftime("%Y%m%d-%H%M%S", gmtime())
     rand_batch_z = np.random.uniform(-1, 1, size=(2 , dcgan.z_dim))
