@@ -392,7 +392,7 @@ def generate_continuous_random_interps(sess, dcgan, config, total_frame_num, is_
             z1 = np.asarray(rand_batch_z[0, :])
         else:
             z1 = z2
-        z2 = np.asarray(rand_batch_z[0, :])
+        z2 = np.asarray(rand_batch_z[1, :])
         # z2 = np.random.uniform(-1, 1, size=(1 , dcgan.z_dim))[0]
         print("MEEE newly assigned z1: " + str(z1))
         print("MEEE newly gen uniform z2: " + str(z2))
