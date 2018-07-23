@@ -351,7 +351,10 @@ def walk_seed(seed):
     # print("MEEE walk seed diff: " + str(np_result_seed - np_seed))
     return result_seed
 
-def generate_continuous_random_interps(sess, dcgan, config, total_frame_num, is_break, interp_num):
+# is_break : True for storyboard style of montage, as opposed to continuous animation
+# interp_num : Number of frames of interpolation between two randomly generated images
+# is_var_interp_num : True for varying number of frames per interpolation
+def generate_continuous_random_interps(sess, dcgan, config, total_frame_num, is_break, interp_num, is_var_interp_num):
     steps_per_interp = interp_num   # PARAM
     stored_images = 0
     time_stamp = strftime("%Y%m%d-%H%M%S", gmtime())
@@ -393,6 +396,9 @@ def generate_continuous_random_interps(sess, dcgan, config, total_frame_num, is_
         else:
             z1 = z2
         z2 = np.asarray(rand_batch_z[1, :])
+
+        if is_var_interp_num:
+            steps_per_interp = random.randint(16, 128 * 4)
         # z2 = np.random.uniform(-1, 1, size=(1 , dcgan.z_dim))[0]
         print("MEEE newly assigned z1: " + str(z1))
         print("MEEE newly gen uniform z2: " + str(z2))
