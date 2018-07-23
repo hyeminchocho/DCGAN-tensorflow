@@ -351,7 +351,7 @@ def walk_seed(seed):
     # print("MEEE walk seed diff: " + str(np_result_seed - np_seed))
     return result_seed
 
-def generate_continuous_random_interps(sess, dcgan, config, total_frame_num):
+def generate_continuous_random_interps(sess, dcgan, config, total_frame_num, is_break):
     steps_per_interp = 4   # PARAM
     stored_images = 0
     time_stamp = strftime("%Y%m%d-%H%M%S", gmtime())
@@ -388,7 +388,10 @@ def generate_continuous_random_interps(sess, dcgan, config, total_frame_num):
                 batch_seeds = np.zeros(shape=(64, 100))
 
         rand_batch_z = np.random.uniform(-1, 1, size=(config.batch_size , dcgan.z_dim))
-        z1 = z2
+        if is_break:
+            z1 = np.asarray(rand_batch_z[0, :])
+        else:
+            z1 = z2
         z2 = np.asarray(rand_batch_z[0, :])
         # z2 = np.random.uniform(-1, 1, size=(1 , dcgan.z_dim))[0]
         print("MEEE newly assigned z1: " + str(z1))
